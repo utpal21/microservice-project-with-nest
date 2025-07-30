@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongo-auth:
+    image: mongo:6
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-auth-data:/data/db
+
+  mongo-product:
+    image: mongo:6
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-product-data:/data/db
+
+  auth-service:
+    build:
+      context: ./auth-service
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+    command: npm run start:dev
+    ports:
+      - "3001:3000"
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      - mongo-auth
+      - rabbitmq
+
+  product-service:
+    build:
+      context: ./product-service
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - ./product-service:/app
+      - /app/node_modules
+    command: npm run start:dev
+    ports:
+      - "3002:3000"
+    env_file:
+      - ./product-service/.env
+    depends_on:
+      - mongo-product
+      - rabbitmq
+
+volumes:
+  mongo-auth-data:
+  mongo-product-data:

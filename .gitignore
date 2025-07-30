@@ -1,0 +1,19 @@
+# Node
+node_modules
+dist
+npm-debug.log
+.env
+.env.*
+package-lock.json
+
+# Logs
+logs
+*.log
+
+# Build
+coverage
+.DS_Store
+
+# Docker
+Dockerfile
+.dockerignore
