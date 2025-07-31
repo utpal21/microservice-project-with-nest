@@ -6,6 +6,7 @@
     "product-service"
   ],
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0"
@@ -14,6 +15,8 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": ["prettier --write"]
+    "*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
   }
 }
