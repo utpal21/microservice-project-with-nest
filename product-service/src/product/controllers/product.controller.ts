@@ -21,14 +21,14 @@ export class ProductController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateProductDto, @Req() req: any) {
-        const token = req.headers.authorization?.split(' ')[1];
-        return this.productService.updateProduct(id, dto, token);
+    update(@Param('id') id: string, @Body() dto: UpdateProductDto, @Req() req: Request) {
+        // const token = req.headers.authorization?.split(' ')[1];
+        return this.productService.updateProduct(id, dto, req.user!);
     }
 
     @Delete(':id')
-    delete(@Param('id') id: string, @Req() req: any) {
-        const token = req.headers.authorization?.split(' ')[1];
-        return this.productService.deleteProduct(id, token);
+    delete(@Param('id') id: string, @Req() req: Request) {
+        // const token = req.headers.authorization?.split(' ')[1];
+        return this.productService.deleteProduct(id, req.user!);
     }
 }

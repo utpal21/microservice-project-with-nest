@@ -5,6 +5,7 @@ import { UpdateProductDto } from '../dto/update-product.dto';
 import { Types } from 'mongoose';
 import { PublisherService } from '../../rabbitmq/publisher.service';
 
+
 @Injectable()
 export class ProductService {
     private readonly logger = new Logger(ProductService.name);
@@ -26,29 +27,36 @@ export class ProductService {
         return this.productRepo.findAll();
     }
 
-    async updateProduct(id: string, dto: UpdateProductDto, token: string) {
-        const authData = await this.publisher.validateToken(token);
-        if (!authData?.userId) throw new ForbiddenException('Invalid token');
-
+    async updateProduct(id: string, dto: UpdateProductDto, user: { id: string }) {
         const product = await this.productRepo.findById(new Types.ObjectId(id));
         if (!product) throw new NotFoundException('Product not found');
+        console.log(product.userId.toString(),  user.id);
+        if (product.userId.toString() !== user.id) {
+            throw new ForbiddenException('Not authorized to update this product');
+        }
+        // dto is a partial update object, pass it directly
+        const updatedProduct = await this.productRepo.update(
+            new Types.ObjectId(id), 
+            dto
+        );
 
-        if (product.userId.toString() !== authData.userId)
-            throw new ForbiddenException('Not authorized');
+        if (!updatedProduct) throw new NotFoundException('Failed to update product');
 
-        return this.productRepo.update(new Types.ObjectId(id), dto);
+        return updatedProduct;
     }
 
-    async deleteProduct(id: string, token: string) {
-        const authData = await this.publisher.validateToken(token);
-        if (!authData?.userId) throw new ForbiddenException('Invalid token');
 
+    async deleteProduct(id: string, user: { id: string }) {
         const product = await this.productRepo.findById(new Types.ObjectId(id));
         if (!product) throw new NotFoundException('Product not found');
 
-        if (product.userId.toString() !== authData.userId)
-            throw new ForbiddenException('Not authorized');
+        if (product.userId.toString() !== user.id) {
+            throw new ForbiddenException('Not authorized to delete this product');
+        }
 
-        return this.productRepo.delete(new Types.ObjectId(id));
+        const deleted = await this.productRepo.delete(new Types.ObjectId(id));
+        if (!deleted) throw new NotFoundException('Failed to delete product');
+
+        return { id, message: 'Product deleted successfully' };
     }
 }
