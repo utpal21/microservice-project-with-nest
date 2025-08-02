@@ -63,8 +63,13 @@ export class AuthService {
     }
 
     async validateToken(token: string) {
+        const cleanToken = token.replace(/^Bearer\s+/, '');
+        console.log('🔑 Validating token:', cleanToken);
+        console.log('🔐 Using secret:', process.env.JWT_SECRET);
         try {
-            return this.jwt.verify(token);
+            const decoded = this.jwt.verify(cleanToken, { secret: process.env.JWT_SECRET });
+            console.log('✅ Token decoded:', decoded);
+            return decoded;
         } catch {
             throw new UnauthorizedException('Invalid token');
         }

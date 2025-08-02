@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards, Logger } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
@@ -6,6 +6,9 @@ import { RefreshTokenDto } from '../dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
+
+    private readonly logger = new Logger(AuthController.name);
+
     constructor(private readonly authService: AuthService) {}
 
     @Post('register')

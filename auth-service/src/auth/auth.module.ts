@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypegooseModule } from '@m8a/nestjs-typegoose';
 import { AuthController } from './controllers/auth.controller';
+import { AuthMessageController } from './controllers/auth-message.controller';
 import { AuthService } from './services/auth.service';
 import { User } from './models/user.model';
 import { RefreshToken } from './models/refresh-token.model';
@@ -23,7 +24,7 @@ import { PublisherService } from '../rabbitmq/publisher.service';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AuthMessageController],
   providers: [AuthService, UserRepository, AuthRepository, PublisherService],
 })
 export class AuthModule {}
