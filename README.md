@@ -10,12 +10,14 @@ This monorepo contains two microservices built with NestJS:
 ## Table of Contents
 
 - [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Setup Instructions](#setup-instructions)
 - [Running the Services](#running-the-services)
   - [Without Docker](#without-docker)
-  - [Using Docker Compose](#using-docker-compose)
+  - [Using Docker Compose](#with-docker)
 - [Environment Variables](#environment-variables)
 - [Inter-Service Communication Flow](#inter-service-communication-flow)
+- [Postman Collection](#postman-collection)
 
 ---
 
@@ -29,6 +31,16 @@ This monorepo contains two microservices built with NestJS:
 - Centralized logging and error handling  
 - Auth Guard integrated in Product Service to protect routes  
 - MongoDB with Typegoose for ODM  
+
+
+---
+
+## Tech Stack
+- **NestJS (v10)** – Modular architecture for each service
+- **MongoDB** – Database for Auth and Product services
+- **RabbitMQ** – Message broker for inter-service communication
+- **Typegoose + Mongoose** – MongoDB ODM with TypeScript support
+- **Docker + Docker Compose** – Containerized setup for services
 
 ---
 
@@ -59,6 +71,7 @@ npm install
 
 ## MongoDB Setup
 - Run MongoDB locally or use a hosted provider. Ensure databases:
+- install and run MongoDB locally on mongodb://127.0.0.1:27017
 - authdb for Auth Service
 - product-db for Product Service
 
@@ -87,6 +100,13 @@ npm run build
 npm run start
 ```
 
+## With Docker
+At the project root:
+```bash
+docker-compose build --no-cache                              
+docker-compose up -d
+```
+
 # Inter-Service Communication Flow
 ## User Authentication: 
 - Handled by Auth Service with JWT tokens.
@@ -106,3 +126,6 @@ npm run start
 - Services can run independently or via Docker Compose.
 - Logging and error handling are centralized.
 - RabbitMQ queues and exchange names should be consistent across services.
+
+## Postman Collection
+https://github.com/utpal21/microservice-project-with-nest/blob/main/Microservice.postman_collection.json
