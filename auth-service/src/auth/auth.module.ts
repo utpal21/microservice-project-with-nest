@@ -1,18 +1,29 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { AuthRpcController } from './auth.rpc';
-import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypegooseModule } from '@m8a/nestjs-typegoose';
+import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
+import { User } from './models/user.model';
+import { RefreshToken } from './models/refresh-token.model';
+import { UserRepository } from './repositories/user.repository';
+import { AuthRepository } from './repositories/auth.repository';
+import { PublisherService } from '../rabbitmq/publisher.service';
 
 @Module({
   imports: [
-    UsersModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET
-    })
+    ConfigModule,
+    TypegooseModule.forFeature([User, RefreshToken]),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+    }),
   ],
-  controllers: [AuthController, AuthRpcController],
-  providers: [AuthService],
+  controllers: [AuthController],
+  providers: [AuthService, UserRepository, AuthRepository, PublisherService],
 })
 export class AuthModule {}

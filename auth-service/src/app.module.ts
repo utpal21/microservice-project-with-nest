@@ -1,21 +1,33 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypegooseModule } from '@m8a/nestjs-typegoose'; 
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { PublisherService } from './rabbitmq/publisher.service';
-import { AppController } from './app.controller';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypegooseModule } from "@m8a/nestjs-typegoose";
+import { AuthModule } from "./auth/auth.module";
+import * as path from "path";
+import * as fs from "fs";
 
-console.log('AppModule sees User:', UsersModule);
+console.log("ENV PATH:", path.join(process.cwd(), ".env"));
+console.log("ENV FILE EXISTS:", fs.existsSync(path.join(process.cwd(), ".env")));
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypegooseModule.forRoot(process.env.MONGO_URI as string),
+    imports: [
+        ConfigModule.forRoot({
+        isGlobal: true,
+        envFilePath: path.join(process.cwd(), ".env"),
+    }),
+    TypegooseModule.forRootAsync({
+    imports: [ConfigModule],
+    useFactory: async (config: ConfigService) => {
+        const uri = config.get<string>("MONGO_URI") || "mongodb://127.0.0.1:27017/authdb";
+        console.log("Final Mongo URI:", uri);
+
+        return {
+        uri,
+        serverSelectionTimeoutMS: 5000,
+        };
+    },
+    inject: [ConfigService],
+    }),
     AuthModule,
-    UsersModule,
-  ],
-  controllers: [AppController],
-  providers: [PublisherService],
+    ],
 })
 export class AppModule {}
