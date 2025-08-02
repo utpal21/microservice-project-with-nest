@@ -1,7 +1,7 @@
+import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
 import { UserRepository } from '../repositories/user.repository';
 import { AuthRepository } from '../repositories/auth.repository';
 import { PublisherService } from '../../rabbitmq/publisher.service';
@@ -64,13 +64,14 @@ export class AuthService {
 
     async validateToken(token: string) {
         const cleanToken = token.replace(/^Bearer\s+/, '');
-        console.log('🔑 Validating token:', cleanToken);
-        console.log('🔐 Using secret:', process.env.JWT_SECRET);
+        console.log('Validating token:', cleanToken);
+        console.log('Using secret:', process.env.JWT_SECRET);
         try {
             const decoded = this.jwt.verify(cleanToken, { secret: process.env.JWT_SECRET });
-            console.log('✅ Token decoded:', decoded);
+            console.log('Token decoded:', decoded);
             return decoded;
-        } catch {
+        } catch(err) {
+            console.error('JWT verify failed:', err);
             throw new UnauthorizedException('Invalid token');
         }
     }

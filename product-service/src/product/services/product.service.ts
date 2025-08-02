@@ -7,60 +7,48 @@ import { PublisherService } from '../../rabbitmq/publisher.service';
 
 @Injectable()
 export class ProductService {
-  private readonly logger = new Logger(ProductService.name);
+    private readonly logger = new Logger(ProductService.name);
 
-  constructor(
-    private readonly productRepo: ProductRepository,
-    private readonly publisher: PublisherService,
-  ) {}
+    constructor(
+        private readonly productRepo: ProductRepository,
+        private readonly publisher: PublisherService,
+    ) {}
 
-  async createProduct(dto: CreateProductDto, req: Request) {
-    // const authData = await this.publisher.validateToken(token);
-    console.log('🔍 Auth Data from RabbitMQ:', req);
-    // if (!authData?.id) throw new ForbiddenException('Invalid token');
 
-    return this.productRepo.create({
-      ...dto,
-      userId: new Types.ObjectId(111),
-    });
-  }
+    async createProduct(dto: CreateProductDto, user: { id: string }) {
+        return this.productRepo.create({
+            ...dto,
+            userId: new Types.ObjectId(user.id),
+        });
+    }
 
-  async getAllProducts() {
-    return this.productRepo.findAll();
-  }
+    async getAllProducts() {
+        return this.productRepo.findAll();
+    }
 
-  async updateProduct(id: string, dto: UpdateProductDto, token: string) {
-    const authData = await this.publisher.validateToken(token);
-    if (!authData?.userId) throw new ForbiddenException('Invalid token');
+    async updateProduct(id: string, dto: UpdateProductDto, token: string) {
+        const authData = await this.publisher.validateToken(token);
+        if (!authData?.userId) throw new ForbiddenException('Invalid token');
 
-    const product = await this.productRepo.findById(new Types.ObjectId(id));
-    if (!product) throw new NotFoundException('Product not found');
+        const product = await this.productRepo.findById(new Types.ObjectId(id));
+        if (!product) throw new NotFoundException('Product not found');
 
-    if (product.userId.toString() !== authData.userId)
-      throw new ForbiddenException('Not authorized');
+        if (product.userId.toString() !== authData.userId)
+            throw new ForbiddenException('Not authorized');
 
-    return this.productRepo.update(new Types.ObjectId(id), dto);
-  }
-//   async update(id: string, dto: UpdateProductDto, userId: string) {
-//   const product = await this.productRepo.findById(id);
-//   if (!product) throw new NotFoundException('Product not found');
+        return this.productRepo.update(new Types.ObjectId(id), dto);
+    }
 
-//   if (product.ownerId.toString() !== userId) {
-//     throw new ForbiddenException('You are not allowed to update this product');
-//   }
+    async deleteProduct(id: string, token: string) {
+        const authData = await this.publisher.validateToken(token);
+        if (!authData?.userId) throw new ForbiddenException('Invalid token');
 
-//   return this.productRepo.update(id, dto);
+        const product = await this.productRepo.findById(new Types.ObjectId(id));
+        if (!product) throw new NotFoundException('Product not found');
 
-  async deleteProduct(id: string, token: string) {
-    const authData = await this.publisher.validateToken(token);
-    if (!authData?.userId) throw new ForbiddenException('Invalid token');
+        if (product.userId.toString() !== authData.userId)
+            throw new ForbiddenException('Not authorized');
 
-    const product = await this.productRepo.findById(new Types.ObjectId(id));
-    if (!product) throw new NotFoundException('Product not found');
-
-    if (product.userId.toString() !== authData.userId)
-      throw new ForbiddenException('Not authorized');
-
-    return this.productRepo.delete(new Types.ObjectId(id));
-  }
+        return this.productRepo.delete(new Types.ObjectId(id));
+    }
 }
