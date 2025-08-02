@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
@@ -13,7 +14,7 @@ async function bootstrap() {
      // Apply AuthGuard globally
     const authGuard = app.get(AuthGuard);
     app.useGlobalGuards(authGuard);
-    
+
     const logger = new Logger('Bootstrap');
     const port = process.env.PORT || 3001;
     await app.listen(port);

@@ -1,22 +1,27 @@
 {
-  "name": "microservice-project-with-node",
+  "name": "nestjs-microservices-monorepo",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "auth-service",
     "product-service"
   ],
   "devDependencies": {
-    "@types/amqplib": "^0.10.7",
-    "husky": "^9.0.0",
     "lint-staged": "^15.0.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
   },
   "scripts": {
-    "prepare": "husky install"
+    "format": "prettier --write .",
+    "lint": "eslint \"**/*.ts\" --fix",
+    "start:auth": "yarn workspace auth-service start:dev",
+    "start:product": "yarn workspace product-service start:dev",
+    "build:auth": "yarn workspace auth-service build",
+    "build:product": "yarn workspace product-service build"
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": [
-      "prettier --write"
-    ]
+    "*.{ts,js,json,md}": ["prettier --write"]
   }
 }
