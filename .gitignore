@@ -1,19 +1,64 @@
-# Node
+# ================================================
+# 🔹 Node.js & NestJS build artifacts
+# ================================================
 node_modules
 dist
-npm-debug.log
-.env
-.env.*
-package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Logs
+# ================================================
+# 🔹 Service-specific builds
+# ================================================
+/auth-service/node_modules
+/auth-service/dist
+/product-service/node_modules
+/product-service/dist
+
+# ================================================
+# 🔹 Logs
+# ================================================
 logs
 *.log
 
-# Build
+# ================================================
+# 🔹 Test coverage
+# ================================================
 coverage
-.DS_Store
+.nyc_output
 
-# Docker
-Dockerfile
-.dockerignore
+# ================================================
+# 🔹 OS generated files
+# ================================================
+.DS_Store
+Thumbs.db
+
+# ================================================
+# 🔹 Editors & IDEs
+# ================================================
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# ================================================
+# 🔹 Docker related
+# ================================================
+docker-data/
+*.pid
+
+# ================================================
+# 🔹 Optional - Ignore build cache
+# ================================================
+.cache/
+.tmp/
