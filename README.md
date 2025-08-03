@@ -108,15 +108,21 @@ docker-compose up -d
 ```
 
 # Inter-Service Communication Flow
-## User Authentication: 
-- Handled by Auth Service with JWT tokens.
 
-## Product Service:
+1️⃣ Product Service receives a request → Extracts JWT token from Authorization: Bearer <token> header.
+2️⃣ Product Service AuthGuard → Sends token to Auth Service via RabbitMQ RPC (client.send({ cmd: 'validate_token' })).
+3️⃣ Auth Service validates token using JwtService.verify() and responds with payload or error.
+4️⃣ Product Service proceeds with the request (e.g., create product) only if the token is valid.
 
-- On each request to protected routes, Product Service extracts the JWT from Authorization header.
-- Product Service sends a message via RabbitMQ to Auth Service with the token to validate it (validate_token message pattern).
-- Auth Service verifies the token and responds with validation status and user info.
-- Product Service allows or denies access based on Auth Service response.
+🛠 Example Flow (Create Product)
+```mermaid
+
+User ->> ProductService: POST /products (with JWT token)
+ProductService ->> AuthService: RPC validate_token via RabbitMQ
+AuthService ->> ProductService: Response { valid: true, payload: { userId } }
+ProductService ->> MongoDB: Create Product with ownerId = userId
+ProductService ->> User: 201 Created (Product)
+```
 
 ## Event Communication:
 
